@@ -23,11 +23,6 @@ jobs:
         with:
           python-version: '3.10'
 
-      - name: Install locales
-        run: |
-          apt-get update && apt-get install -y locales
-          sed -i '/ja_JP.UTF-8/s/^# //g' /etc/locale.gen && locale-gen
-
       - name: Unit test
         run: |
           pip install -e .[dev]
