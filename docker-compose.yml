@@ -1,0 +1,21 @@
+version: "3.9"
+
+services:
+  chrome:
+    image: seleniarm/standalone-chromium:latest
+    ports:
+      - 4444:4444
+      - 5900:5900
+    tty: true
+    networks:
+      default:
+        aliases:
+          - local.selenium
+    volumes:
+      - /dev/shm:/dev/shm
+
+  app:
+    build: .
+    env_file:
+      - .env
+    tty: true
