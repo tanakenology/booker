@@ -27,7 +27,7 @@ class ReservationTaskTestCase(TestCase):
     @patch("booker.tasks.config")
     def test__call(self, config_mock, webdriver_mock, start_mock):
         user = MagicMock(spec=User)
-        config_mock.SELENIUM_REMOTE_URL = config.SELENIUM_REMOTE_URL
+        config_mock.SELENIUM_REMOTE_URL = "http://local.selenium:4444/wd/hub"
         options = webdriver_mock.ChromeOptions.return_value
         driver = webdriver_mock.Remote.return_value
 
