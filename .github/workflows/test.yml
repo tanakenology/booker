@@ -23,6 +23,10 @@ jobs:
         with:
           python-version: '3.10'
 
+      - name: Run locale-gen
+        run: |
+          sudo locale-gen ja_JP.UTF-8
+
       - name: Unit test
         run: |
           pip install -e .[dev]
