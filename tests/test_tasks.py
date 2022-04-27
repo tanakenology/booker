@@ -24,8 +24,10 @@ class ReservationTaskTestCase(TestCase):
 
     @patch("booker.tasks.ReservationTask._start")
     @patch("booker.tasks.webdriver")
-    def test__call(self, webdriver_mock, start_mock):
+    @patch("booker.tasks.config")
+    def test__call(self, config_mock, webdriver_mock, start_mock):
         user = MagicMock(spec=User)
+        config_mock.SELENIUM_REMOTE_URL = config.SELENIUM_REMOTE_URL
         options = webdriver_mock.ChromeOptions.return_value
         driver = webdriver_mock.Remote.return_value
 
@@ -36,6 +38,27 @@ class ReservationTaskTestCase(TestCase):
         webdriver_mock.Remote.assert_called_once_with(
             command_executor=config.SELENIUM_REMOTE_URL,
             desired_capabilities=options.to_capabilities.return_value,
+            options=options,
+        )
+        driver.set_window_size.assert_called_once_with(1200, 900)
+        start_mock.assert_called_once_with(driver)
+
+    @patch("booker.tasks.ReservationTask._start")
+    @patch("booker.tasks.webdriver")
+    @patch("booker.tasks.config")
+    def test_call_in_lambda(self, config_mock, webdriver_mock, start_mock):
+        user = MagicMock(spec=User)
+        config_mock.SELENIUM_REMOTE_URL = None
+        options = webdriver_mock.ChromeOptions.return_value
+        driver = webdriver_mock.Chrome.return_value
+
+        sut = ReservationTask(user)
+        actual = sut()
+
+        self.assertIsNone(actual)
+        options.add_argument.assert_called_once_with("--headless")
+        webdriver_mock.Chrome.assert_called_once_with(
+            executable_path="/opt/chrome",
             options=options,
         )
         driver.set_window_size.assert_called_once_with(1200, 900)
