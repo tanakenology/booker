@@ -30,7 +30,8 @@ class ReservationTask:
 
         for xpath_date_link in metadata.XPATH_DATE_LINKS:
             date_element = driver.find_element(By.XPATH, xpath_date_link)
-            if self._match_date_pattern(date_element.text):
+            date = date_element.text
+            if self._match_date_pattern(date):
                 # click a date link
                 date_element.click()
 
@@ -39,7 +40,7 @@ class ReservationTask:
 
                 # reserve date if reservable
                 if self._is_reservable(driver):
-                    self._reserve(driver, date_element.text)
+                    self._reserve(driver, date)
 
                 # close date application form page
                 driver.close()
