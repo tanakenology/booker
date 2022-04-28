@@ -58,7 +58,7 @@ class ReservationTaskTestCase(TestCase):
         self.assertIsNone(actual)
         options.add_argument.assert_called_once_with("--headless")
         webdriver_mock.Chrome.assert_called_once_with(
-            executable_path="/opt/chrome",
+            executable_path="/opt/chrome/chromedriver",
             options=options,
         )
         driver.set_window_size.assert_called_once_with(1200, 900)

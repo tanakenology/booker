@@ -13,7 +13,8 @@ RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key
 
 ADD https://chromedriver.storage.googleapis.com/101.0.4951.41/chromedriver_linux64.zip /opt/chrome/
 RUN cd /opt/chrome/ && \
-unzip chromedriver_linux64.zip
+    unzip chromedriver_linux64.zip && \
+    chmod a+x /opt/chrome/chromedriver
 
 COPY booker /usr/src/booker
 

@@ -24,8 +24,9 @@ class ReservationTask:
             )
         else:
             options.add_argument("--headless")
+            options.add_argument("--no-sandbox")
             driver = webdriver.Chrome(
-                executable_path="/opt/chrome",
+                executable_path="/opt/chrome/chromedriver",
                 options=options,
             )
         driver.set_window_size(1200, 900)
