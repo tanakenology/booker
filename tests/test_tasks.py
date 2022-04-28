@@ -56,7 +56,9 @@ class ReservationTaskTestCase(TestCase):
         actual = sut()
 
         self.assertIsNone(actual)
-        options.add_argument.assert_called_once_with("--headless")
+        options.add_argument.assert_has_calls(
+            [call("--headless"), call("--no-sandbox")]
+        )
         webdriver_mock.Chrome.assert_called_once_with(
             executable_path="/opt/chrome/chromedriver",
             options=options,
