@@ -36,7 +36,7 @@ class ReservationTaskTestCase(TestCase):
 
         self.assertIsNone(actual)
         webdriver_mock.Remote.assert_called_once_with(
-            command_executor=config.SELENIUM_REMOTE_URL,
+            command_executor="http://local.selenium:4444/wd/hub",
             desired_capabilities=options.to_capabilities.return_value,
             options=options,
         )
