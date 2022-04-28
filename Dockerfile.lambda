@@ -1,32 +1,19 @@
-FROM public.ecr.aws/lambda/python@sha256:2203844d7263f9c38a7f03f25bbb181772e93abc944de2b26ccca1689e1dde55 as build
+FROM python:3.7
 
-RUN yum install -y unzip && \
-    curl -Lo "/tmp/chromedriver.zip" "https://chromedriver.storage.googleapis.com/101.0.4951.41/chromedriver_linux64.zip" && \
-    curl -Lo "/tmp/chrome-linux.zip" "https://www.googleapis.com/download/storage/v1/b/chromium-browser-snapshots/o/Linux_x64%2F982481%2Fchrome-linux.zip?alt=media" && \
-    unzip /tmp/chromedriver.zip -d /opt/ && \
-    unzip /tmp/chrome-linux.zip -d /opt/
-
-FROM public.ecr.aws/lambda/python@sha256:2203844d7263f9c38a7f03f25bbb181772e93abc944de2b26ccca1689e1dde55
-
-RUN apt-get update && apt-get install -y locales unzip wget gnupg
-
+RUN apt update && apt install -y locales
 RUN sed -i '/ja_JP.UTF-8/s/^# //g' /etc/locale.gen && locale-gen
 ENV LANG ja_JP.UTF-8
 ENV LANGUAGE ja_JP:ja
 ENV LC_ALL ja_JP.UTF-8
 
-RUN yum install atk cups-libs gtk3 libXcomposite alsa-lib \
-    libXcursor libXdamage libXext libXi libXrandr libXScrnSaver \
-    libXtst pango at-spi2-atk libXt xorg-x11-server-Xvfb \
-    xorg-x11-xauth dbus-glib dbus-glib-devel -y
+RUN sh -c 'echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
+RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
+RUN apt update && apt install -y google-chrome-stable
+
+RUN wget https://chromedriver.storage.googleapis.com/101.0.4951.41/chromedriver_linux64.zip
+RUN unzip chromedriver_linux64.zip -d /usr/bin/
 
 COPY booker /usr/src/booker
-
 WORKDIR /usr/src
 COPY setup.py .
 RUN pip install .
-
-COPY --from=build /opt/chrome-linux /opt/chrome
-COPY --from=build /opt/chromedriver /opt/
-
-ENV PATH /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/chrome

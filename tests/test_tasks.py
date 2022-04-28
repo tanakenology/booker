@@ -1,5 +1,5 @@
 from unittest import TestCase
-from unittest.mock import MagicMock, call, patch, mock_open
+from unittest.mock import MagicMock, call, mock_open, patch
 
 import pytest
 from booker.tasks import (
@@ -57,10 +57,14 @@ class ReservationTaskTestCase(TestCase):
 
         self.assertIsNone(actual)
         options.add_argument.assert_has_calls(
-            [call("--headless"), call("--no-sandbox")]
+            [
+                call("--headless"),
+                call("--no-sandbox"),
+                call("--disable-dev-shm-usage"),
+            ]
         )
         webdriver_mock.Chrome.assert_called_once_with(
-            executable_path="/opt/chrome/chromedriver",
+            executable_path="/usr/bin/chromedriver",
             options=options,
         )
         driver.set_window_size.assert_called_once_with(1200, 900)

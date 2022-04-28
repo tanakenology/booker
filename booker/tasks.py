@@ -25,8 +25,9 @@ class ReservationTask:
         else:
             options.add_argument("--headless")
             options.add_argument("--no-sandbox")
+            options.add_argument("--disable-dev-shm-usage")
             driver = webdriver.Chrome(
-                executable_path="/opt/chrome/chromedriver",
+                executable_path="/usr/bin/chromedriver",
                 options=options,
             )
         driver.set_window_size(1200, 900)
