@@ -6,6 +6,8 @@ ENV LANG ja_JP.UTF-8
 ENV LANGUAGE ja_JP:ja
 ENV LC_ALL ja_JP.UTF-8
 
+RUN apt update && apt install -y libglib2.0-0 libnss3 libgconf-2-4 libfontconfig1
+
 RUN curl -SL https://github.com/adieuadieu/serverless-chrome/releases/download/v1.0.0-37/stable-headless-chromium-amazonlinux-2017-03.zip > headless-chromium.zip
 RUN unzip headless-chromium.zip -d /usr/bin/
 RUN rm headless-chromium.zip
