@@ -56,6 +56,7 @@ class ReservationTaskTestCase(TestCase):
         actual = sut()
 
         self.assertIsNone(actual)
+        self.assertEqual(options.binary_location, "/usr/bin/headless-chromium")
         options.add_argument.assert_has_calls(
             [
                 call("--headless"),

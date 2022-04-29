@@ -23,6 +23,7 @@ class ReservationTask:
                 options=options,
             )
         else:
+            options.binary_location = "/usr/bin/headless-chromium"
             options.add_argument("--headless")
             options.add_argument("--no-sandbox")
             options.add_argument("--disable-dev-shm-usage")
@@ -138,7 +139,7 @@ class ReservationTask:
 
 
 class NotificationTask:
-    def __init__(self, reservations: list[Reservation]):
+    def __init__(self, reservations):
         self.reservations = reservations
         self.token = config.SLACK_TOKEN
         self.channel = config.SLACK_CHANNEL
