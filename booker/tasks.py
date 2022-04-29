@@ -37,7 +37,7 @@ class ReservationTask:
             options.add_argument("--ignore-certificate-errors")
             options.add_argument("--homedir=/tmp")
             driver = webdriver.Chrome(
-                executable_path="/usr/bin/chromedriver",
+                "/usr/bin/chromedriver",
                 options=options,
             )
         driver.set_window_size(1200, 900)
@@ -85,19 +85,19 @@ class ReservationTask:
         ).send_keys(self.user.name_kanji)
 
         # fill kana name form
-        driver.find_element(
-            By.XPATH, metadata.XPATH_NAME_KANA_FORM
-        ).send_keys(self.user.name_kana)
+        driver.find_element(By.XPATH, metadata.XPATH_NAME_KANA_FORM).send_keys(
+            self.user.name_kana
+        )
 
         # fill telephone form
-        driver.find_element(
-            By.XPATH, metadata.XPATH_TELEPHONE_FORM
-        ).send_keys(self.user.telephone)
+        driver.find_element(By.XPATH, metadata.XPATH_TELEPHONE_FORM).send_keys(
+            self.user.telephone
+        )
 
         # fill email form
-        driver.find_element(
-            By.XPATH, metadata.XPATH_EMAIL_FORM
-        ).send_keys(self.user.email)
+        driver.find_element(By.XPATH, metadata.XPATH_EMAIL_FORM).send_keys(
+            self.user.email
+        )
 
         # fill email confirmation form
         driver.find_element(
@@ -115,9 +115,7 @@ class ReservationTask:
         ).click()
 
         # click apply button
-        driver.find_element(
-            By.XPATH, metadata.XPATH_APPLY_BUTTON
-        ).click()
+        driver.find_element(By.XPATH, metadata.XPATH_APPLY_BUTTON).click()
 
         self._store_reservation(driver, date)
 
@@ -137,12 +135,8 @@ class ReservationTask:
         )
 
     def _save_screenshot(self, driver, date):
-        w = driver.execute_script(
-            "return document.body.scrollWidth"
-        )
-        h = driver.execute_script(
-            "return document.body.scrollHeight"
-        )
+        w = driver.execute_script("return document.body.scrollWidth")
+        h = driver.execute_script("return document.body.scrollHeight")
         driver.set_window_size(w, h)
         driver.save_screenshot(f"{date}.png")
 

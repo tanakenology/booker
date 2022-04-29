@@ -74,7 +74,7 @@ class ReservationTaskTestCase(TestCase):
             ]
         )
         webdriver_mock.Chrome.assert_called_once_with(
-            executable_path="/usr/bin/chromedriver",
+            "/usr/bin/chromedriver",
             options=options,
         )
         driver.set_window_size.assert_called_once_with(1200, 900)
