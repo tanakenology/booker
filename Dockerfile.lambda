@@ -8,8 +8,8 @@ RUN yum install -y unzip && \
 
 FROM public.ecr.aws/lambda/python:3.8
 
-COPY --from=build /opt/headless-chromium /opt/
-COPY --from=build /opt/chromedriver /opt/
+COPY --from=build /opt/headless-chromium /usr/bin
+COPY --from=build /opt/chromedriver /usr/bin
 
 RUN yum install -y https://dl.google.com/linux/direct/google-chrome-stable_current_x86_64.rpm
 
