@@ -60,17 +60,15 @@ class ReservationTaskTestCase(TestCase):
         options.add_argument.assert_has_calls(
             [
                 call("--headless"),
-                call("--disable-gpu"),
-                call("--window-size=1280x1696"),
-                call("--disable-application-cache"),
-                call("--disable-infobars"),
                 call("--no-sandbox"),
-                call("--hide-scrollbars"),
-                call("--enable-logging"),
-                call("--log-level=0"),
+                call("--disable-gpu"),
+                call("--disable-extensions"),
+                call("--disable-dev-tools"),
+                call("--no-zygote"),
                 call("--single-process"),
-                call("--ignore-certificate-errors"),
-                call("--homedir=/tmp"),
+                call("--disable-dev-shm-usage"),
+                call("--lang=ja-JP"),
+                call("window-size=1920,1080"),
             ]
         )
         webdriver_mock.Chrome.assert_called_once_with(
