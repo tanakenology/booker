@@ -16,6 +16,7 @@ class ReservationTask:
 
     def __call__(self):
         options = webdriver.ChromeOptions()
+        options.add_argument('--no-sandbox')
         driver = webdriver.Remote(
             command_executor=config.SELENIUM_REMOTE_URL,
             desired_capabilities=options.to_capabilities(),

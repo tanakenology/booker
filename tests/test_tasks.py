@@ -35,6 +35,7 @@ class ReservationTaskTestCase(TestCase):
         actual = sut()
 
         self.assertIsNone(actual)
+        options.add_argument.assert_called_once_with("--no-sandbox")
         webdriver_mock.Remote.assert_called_once_with(
             command_executor="http://local.selenium:4444/wd/hub",
             desired_capabilities=options.to_capabilities.return_value,
