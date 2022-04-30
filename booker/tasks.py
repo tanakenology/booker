@@ -131,8 +131,6 @@ class NotificationTask:
         self.channel = config.SLACK_CHANNEL
 
     def __call__(self):
-        if self.reservations == []:
-            print("no reservation")
         for reservation in self.reservations:
             self._notify(reservation)
 
