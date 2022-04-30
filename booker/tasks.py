@@ -17,6 +17,7 @@ class ReservationTask:
     def __call__(self):
         options = webdriver.ChromeOptions()
         options.add_argument('--no-sandbox')
+        options.add_argument('--disable-dev-shm-usage')
         driver = webdriver.Remote(
             command_executor=config.SELENIUM_REMOTE_URL,
             desired_capabilities=options.to_capabilities(),
