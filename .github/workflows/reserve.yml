@@ -17,7 +17,6 @@ jobs:
         image: selenium/standalone-chrome
         ports:
           - 4444:4444
-        tty: true
         networks:
           default:
             aliases:
