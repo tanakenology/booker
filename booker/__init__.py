@@ -1,11 +1,11 @@
-# import locale
+import locale
 import sys
 
 from booker import parser
 from booker.tasks import NotificationTask, ReservationTask
 from booker.types import User
 
-# locale.setlocale(locale.LC_TIME, "ja_JP.UTF-8")
+locale.setlocale(locale.LC_TIME, "ja_JP.UTF-8")
 
 
 def main():

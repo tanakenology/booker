@@ -43,41 +43,6 @@ class ReservationTaskTestCase(TestCase):
         driver.set_window_size.assert_called_once_with(1200, 900)
         start_mock.assert_called_once_with(driver)
 
-    @patch("booker.tasks.ReservationTask._start")
-    @patch("booker.tasks.webdriver")
-    @patch("booker.tasks.config")
-    def test_call_in_lambda(self, config_mock, webdriver_mock, start_mock):
-        user = MagicMock(spec=User)
-        config_mock.SELENIUM_REMOTE_URL = None
-        options = webdriver_mock.ChromeOptions.return_value
-        driver = webdriver_mock.Chrome.return_value
-
-        sut = ReservationTask(user)
-        actual = sut()
-
-        self.assertIsNone(actual)
-        self.assertEqual(options.binary_location, "/usr/bin/headless-chromium")
-        options.add_argument.assert_has_calls(
-            [
-                call("--headless"),
-                call("--no-sandbox"),
-                call("--disable-gpu"),
-                call("--disable-extensions"),
-                call("--disable-dev-tools"),
-                call("--no-zygote"),
-                call("--single-process"),
-                call("--disable-dev-shm-usage"),
-                call("--lang=ja-JP"),
-                call("window-size=1920,1080"),
-            ]
-        )
-        webdriver_mock.Chrome.assert_called_once_with(
-            "/usr/bin/chromedriver",
-            options=options,
-        )
-        driver.set_window_size.assert_called_once_with(1200, 900)
-        start_mock.assert_called_once_with(driver)
-
     @patch("booker.tasks.ReservationTask._reserve")
     @patch("booker.tasks.ReservationTask._is_reservable")
     @patch("booker.tasks.ReservationTask._match_date_pattern")

@@ -16,25 +16,11 @@ class ReservationTask:
 
     def __call__(self):
         options = webdriver.ChromeOptions()
-        if config.SELENIUM_REMOTE_URL:
-            driver = webdriver.Remote(
-                command_executor=config.SELENIUM_REMOTE_URL,
-                desired_capabilities=options.to_capabilities(),
-                options=options,
-            )
-        else:
-            options.binary_location = "/usr/bin/headless-chromium"
-            options.add_argument('--headless')
-            options.add_argument('--no-sandbox')
-            options.add_argument('--disable-gpu')
-            options.add_argument('--disable-extensions')
-            options.add_argument('--disable-dev-tools')
-            options.add_argument('--no-zygote')
-            options.add_argument('--single-process')
-            options.add_argument('--disable-dev-shm-usage')
-            options.add_argument('--lang=ja-JP')
-            options.add_argument('window-size=1920,1080')
-            driver = webdriver.Chrome("/usr/bin/chromedriver", options=options)
+        driver = webdriver.Remote(
+            command_executor=config.SELENIUM_REMOTE_URL,
+            desired_capabilities=options.to_capabilities(),
+            options=options,
+        )
         driver.set_window_size(1200, 900)
         self._start(driver)
 
