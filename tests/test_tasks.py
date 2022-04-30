@@ -275,11 +275,13 @@ class NotificationTaskTestCase(TestCase):
         reservation = self.reservations[0]
         filename = f"{reservation.reserved_date}.png"
         comment = f"""
-        予約が完了しました。```
+        予約が完了しました。
+        ```
         {reservation.application_number}
         {reservation.inquiry_number}
         利用日：{reservation.reserved_date}
-        ```"""
+        ```
+        """
         m = mock_open()
         files = {"file": m.return_value}
 

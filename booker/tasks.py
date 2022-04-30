@@ -131,17 +131,21 @@ class NotificationTask:
         self.channel = config.SLACK_CHANNEL
 
     def __call__(self):
+        if self.reservations == []:
+            print("no reservation")
         for reservation in self.reservations:
             self._notify(reservation)
 
     def _notify(self, reservation):
         filename = f"{reservation.reserved_date}.png"
         comment = f"""
-        予約が完了しました。```
+        予約が完了しました。
+        ```
         {reservation.application_number}
         {reservation.inquiry_number}
         利用日：{reservation.reserved_date}
-        ```"""
+        ```
+        """
         files = {"file": open(filename, "rb")}
         param = {
             "token": self.token,
