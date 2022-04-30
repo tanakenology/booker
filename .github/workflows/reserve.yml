@@ -1,11 +1,8 @@
 name: Reserve
 
 on:
-  workflow_run:
-    workflows: ["Test"]
-    branches: [main]
-    types:
-      - completed
+  schedule:
+    - cron: '35 5 * * 6'
 
 jobs:
   reserve:
