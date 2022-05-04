@@ -16,8 +16,8 @@ class ReservationTask:
 
     def __call__(self):
         options = webdriver.ChromeOptions()
-        options.add_argument('--no-sandbox')
-        options.add_argument('--disable-dev-shm-usage')
+        options.add_argument("--no-sandbox")
+        options.add_argument("--disable-dev-shm-usage")
         driver = webdriver.Remote(
             command_executor=config.SELENIUM_REMOTE_URL,
             desired_capabilities=options.to_capabilities(),
@@ -30,8 +30,10 @@ class ReservationTask:
         # open reservation top page
         driver.get(config.RESERVATION_URL)
 
-        for xpath_date_link in metadata.XPATH_DATE_LINKS:
-            date_element = driver.find_element(By.XPATH, xpath_date_link)
+        date_elements = driver.find_elements(
+            By.CSS_SELECTOR, metadata.CSS_SELECTOR
+        )
+        for date_element in date_elements:
             date = date_element.text
             if self._match_date_pattern(date):
                 # click a date link

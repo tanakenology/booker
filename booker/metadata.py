@@ -1,13 +1,5 @@
 XPATH_RESERVABLE_START_DATE = "/html/body/div[4]/main/div[3]/div/div[2]/section/table[2]/tbody/tr[7]/td[2]/p[4]/span"
-XPATH_DATE_LINKS = [
-    "/html/body/div[4]/main/div[3]/div/div[2]/section/table[2]/tbody/tr[7]/td[1]/p/a",
-    "/html/body/div[4]/main/div[3]/div/div[2]/section/table[2]/tbody/tr[8]/td/p/a",
-    "/html/body/div[4]/main/div[3]/div/div[2]/section/table[2]/tbody/tr[9]/td/p/a",
-    "/html/body/div[4]/main/div[3]/div/div[2]/section/table[2]/tbody/tr[10]/td/p/a",
-    "/html/body/div[4]/main/div[3]/div/div[2]/section/table[2]/tbody/tr[11]/td/p/a",
-    "/html/body/div[4]/main/div[3]/div/div[2]/section/table[2]/tbody/tr[12]/td/p/a",
-    "/html/body/div[4]/main/div[3]/div/div[2]/section/table[2]/tbody/tr[13]/td/p/a",
-]
+CSS_SELECTOR = "a.iconFont.is-outIcon"
 XPATH_NAME_KANJI_FORM = "/html/body/div[3]/form/table/tbody/tr[1]/td[2]/input"
 XPATH_NAME_KANA_FORM = "/html/body/div[3]/form/table/tbody/tr[2]/td[2]/input"
 XPATH_TELEPHONE_FORM = "/html/body/div[3]/form/table/tbody/tr[3]/td[2]/input"

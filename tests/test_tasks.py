@@ -52,27 +52,20 @@ class ReservationTaskTestCase(TestCase):
     @patch("booker.tasks.ReservationTask._reserve")
     @patch("booker.tasks.ReservationTask._is_reservable")
     @patch("booker.tasks.ReservationTask._match_date_pattern")
-    @patch("booker.tasks.metadata")
     def test_start(
         self,
-        metadata_mock,
         match_date_pattern_mock,
         is_reservable_mock,
         reserve_mock,
     ):
         user = MagicMock(spec=User)
         driver = MagicMock()
-        metadata_mock.XPATH_DATE_LINKS = [
-            "xpath_1",
-            "xpath_2",
-            "xpath_3",
-        ]
-        driver_find_element_side_effects = [
+        driver_find_elements_return_value = [
             MagicMock(),
             MagicMock(),
             MagicMock(),
         ]
-        driver.find_element.side_effect = driver_find_element_side_effects
+        driver.find_elements.return_value = driver_find_elements_return_value
         match_date_pattern_mock.side_effect = [False, True, True]
         is_reservable_mock.side_effect = [True, True]
 
@@ -80,35 +73,14 @@ class ReservationTaskTestCase(TestCase):
         actual = sut._start(driver)
 
         self.assertIsNone(actual)
-        driver.find_element.assert_has_calls(
-            [
-                call(By.XPATH, "xpath_1"),
-                call(By.XPATH, "xpath_2"),
-                call(By.XPATH, "xpath_3"),
-            ]
-        )
-        match_date_pattern_mock.assert_has_calls(
-            [
-                call(driver_find_element_side_effects[0].text),
-                call(driver_find_element_side_effects[1].text),
-                call(driver_find_element_side_effects[2].text),
-            ]
-        )
-        driver_find_element_side_effects[1].click.assert_called_once_with()
-        driver_find_element_side_effects[2].click.assert_called_once_with()
-        driver.switch_to.window.assert_has_calls(
-            [
-                call(driver.window_handles[1]),
-                call(driver.window_handles[0]),
-                call(driver.window_handles[1]),
-                call(driver.window_handles[0]),
-            ]
+        driver.find_elements.assert_called_once_with(
+            By.CSS_SELECTOR, metadata.CSS_SELECTOR
         )
         is_reservable_mock.assert_has_calls([call(driver), call(driver)])
         reserve_mock.assert_has_calls(
             [
-                call(driver, driver_find_element_side_effects[1].text),
-                call(driver, driver_find_element_side_effects[2].text),
+                call(driver, driver_find_elements_return_value[1].text),
+                call(driver, driver_find_elements_return_value[2].text),
             ]
         )
         driver.close.assert_has_calls([call(), call()])
