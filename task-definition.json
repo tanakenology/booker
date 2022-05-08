@@ -12,7 +12,16 @@
           "protocol": "tcp"
         }
       ],
-      "essential": true
+      "essential": true,
+      "command": ["booker"],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+            "awslogs-group": "/ecs/booker",
+            "awslogs-region": "ap-northeast-1",
+            "awslogs-stream-prefix": "ecs"
+        }
+      }
     },
     {
       "name": "booker-chrome",
