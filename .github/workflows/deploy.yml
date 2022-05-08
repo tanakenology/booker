@@ -51,17 +51,16 @@ jobs:
         docker tag ${{ env.ECR_REPOSITORY_NAME_CHROME }} $ECR_REGISTRY/${{ env.ECR_REPOSITORY_NAME_CHROME }}:$IMAGE_TAG
         docker push $ECR_REGISTRY/${{ env.ECR_REPOSITORY_NAME_APP }}:$IMAGE_TAG
         docker push $ECR_REGISTRY/${{ env.ECR_REPOSITORY_NAME_CHROME }}:$IMAGE_TAG
+        echo "::set-output name=image_app::$ECR_REGISTRY/${{ env.ECR_REPOSITORY_NAME_APP }}:$IMAGE_TAG"
+        echo "::set-output name=image_chrome::$ECR_REGISTRY/${{ env.ECR_REPOSITORY_NAME_CHROME }}:$IMAGE_TAG"
 
-    - name: Render Amazon ECS task definition for first container
+    - name: Render Amazon ECS task definition for app container
       id: render-app-container
       uses: aws-actions/amazon-ecs-render-task-definition@v1
-      env:
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        IMAGE_TAG: ${{ github.sha }}
       with:
         task-definition: ${{ env.ECS_TASK_DEFINITION }}
         container-name: ${{ env.CONTAINER_NAME_APP }}
-        image: $ECR_REGISTRY/${{ env.ECR_REPOSITORY_NAME_APP }}:$IMAGE_TAG
+        image: ${{ steps.build-image.outputs.image_app }}
         environment-variables: |
           SELENIUM_REMOTE_URL=http://chrome:4444/wd/hub
           RESERVATION_URL=${{ secrets.RESERVATION_URL }}
@@ -73,16 +72,13 @@ jobs:
           SLACK_TOKEN=${{ secrets.SLACK_TOKEN }}
           SLACK_CHANNEL=${{ secrets.SLACK_CHANNEL }}
 
-    - name: Modify Amazon ECS task definition with second container
+    - name: Modify Amazon ECS task definition with chrome container
       id: render-chrome-container
       uses: aws-actions/amazon-ecs-render-task-definition@v1
-      env:
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        IMAGE_TAG: ${{ github.sha }}
       with:
         task-definition: ${{ steps.render-app-container.outputs.task-definition }}
         container-name: ${{ env.CONTAINER_NAME_CHROME }}
-        image: $ECR_REGISTRY/${{ env.ECR_REPOSITORY_NAME_CHROME }}:$IMAGE_TAG
+        image: ${{ steps.build-image.outputs.image_chrome }}
 
     - name: Deploy to Amazon ECS service
       uses: aws-actions/amazon-ecs-deploy-task-definition@v1
