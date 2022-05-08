@@ -2,10 +2,7 @@ version: "3.9"
 
 services:
   chrome:
-    build:
-      context: .
-      dockerfile: ./dockerfiles/Dockerfile.chrome
-    image: booker-chrome
+    image: seleniarm/standalone-chromium:latest
     ports:
       - 4444:4444
       - 5900:5900
@@ -21,7 +18,6 @@ services:
     build:
       context: .
       dockerfile: ./dockerfiles/Dockerfile.app
-    image: booker-app
     env_file:
       - .env
     tty: true
