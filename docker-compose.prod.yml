@@ -1,0 +1,20 @@
+version: "3.9"
+
+services:
+  chrome:
+    build:
+      context: .
+      dockerfile: ./dockerfiles/Dockerfile.chrome
+    image: booker-chrome
+    ports:
+      - 4444:4444
+
+  app:
+    build:
+      context: .
+      dockerfile: ./dockerfiles/Dockerfile.app
+    image: booker-app
+    environment:
+      SELENIUM_REMOTE_URL: http://chrome:4444/wd/hub
+    ports:
+      - 80:80

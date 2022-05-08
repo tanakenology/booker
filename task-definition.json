@@ -1,0 +1,40 @@
+{
+  "family": "booker-task",
+  "networkMode": "awsvpc",
+  "containerDefinitions": [
+    {
+      "name": "booker-app",
+      "image": "booker-app",
+      "portMappings": [
+        {
+          "containerPort": 80,
+          "hostPort": 80,
+          "protocol": "tcp"
+        }
+      ],
+      "essential": true
+    },
+    {
+      "name": "booker-chrome",
+      "image": "booker-chrome",
+      "portMappings": [
+        {
+          "containerPort": 4444,
+          "hostPort": 4444,
+          "protocol": "tcp"
+        }
+      ],
+      "essential": true
+    }
+  ],
+  "runtimePlatform": {
+    "cpuArchitecture": "X86_64",
+    "operatingSystemFamily": "LINUX"
+  },
+  "requiresCompatibilities": [
+    "FARGATE"
+  ],
+  "executionRoleArn": "ecsTaskExecutionRole",
+  "cpu": "256",
+  "memory": "512"
+}
