@@ -61,16 +61,6 @@ jobs:
         task-definition: ${{ env.ECS_TASK_DEFINITION }}
         container-name: ${{ env.CONTAINER_NAME_APP }}
         image: ${{ steps.build-image.outputs.image_app }}
-        environment-variables: |
-          SELENIUM_REMOTE_URL=http://chrome:4444/wd/hub
-          RESERVATION_URL=${{ secrets.RESERVATION_URL }}
-          DATE_PATTERN=${{ secrets.DATE_PATTERN }}
-          NAME_KANJI=${{ secrets.NAME_KANJI }}
-          NAME_KANA=${{ secrets.NAME_KANA }}
-          TELEPHONE=${{ secrets.TELEPHONE }}
-          EMAIL=${{ secrets.EMAIL }}
-          SLACK_TOKEN=${{ secrets.SLACK_TOKEN }}
-          SLACK_CHANNEL=${{ secrets.SLACK_CHANNEL }}
 
     - name: Modify Amazon ECS task definition with chrome container
       id: render-chrome-container
