@@ -75,7 +75,7 @@ jobs:
       with:
         task-definition: ${{ steps.render-app-container.outputs.task-definition }}
         container-name: ${{ env.CONTAINER_NAME_CHROME }}
-        image: image: $ECR_REGISTRY/${{ env.ECR_REPOSITORY_NAME_CHROME }}:$IMAGE_TAG
+        image: $ECR_REGISTRY/${{ env.ECR_REPOSITORY_NAME_CHROME }}:$IMAGE_TAG
 
     - name: Deploy to Amazon ECS service
       uses: aws-actions/amazon-ecs-deploy-task-definition@v1
