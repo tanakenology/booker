@@ -62,6 +62,8 @@ jobs:
         container-name: ${{ env.CONTAINER_NAME_APP }}
         image: ${{ steps.build-image.outputs.image_app }}
         environment-variables: |
+          AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
           USERS_FILE_PATH=${{ secrets.USERS_FILE_PATH }}
           SELENIUM_REMOTE_URL=${{ secrets.SELENIUM_REMOTE_URL }}
           RESERVATION_URL=${{ secrets.RESERVATION_URL }}
