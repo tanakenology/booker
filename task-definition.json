@@ -12,7 +12,6 @@
           "protocol": "tcp"
         }
       ],
-      "essential": true,
       "command": ["booker"],
       "logConfiguration": {
         "logDriver": "awslogs",
@@ -33,7 +32,6 @@
           "protocol": "tcp"
         }
       ],
-      "essential": true,
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
