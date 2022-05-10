@@ -50,6 +50,6 @@
     "FARGATE"
   ],
   "executionRoleArn": "ecsTaskExecutionRole",
-  "cpu": "256",
+  "cpu": "512",
   "memory": "4096"
 }
