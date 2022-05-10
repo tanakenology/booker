@@ -55,7 +55,7 @@ class ReservationTask:
         driver.quit()
 
     def _match_date_pattern(self, date):
-        date_pattern = config.DATE_PATTERN
+        date_pattern = self.user.date_pattern
         for pattern in date_pattern.split(","):
             if pattern in date:
                 return True

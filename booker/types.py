@@ -7,6 +7,7 @@ class User:
     name_kana: str
     telephone: str
     email: str
+    date_pattern: str
 
 
 @dataclass

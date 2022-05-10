@@ -14,7 +14,5 @@ services:
       context: .
       dockerfile: ./dockerfiles/Dockerfile.app
     image: booker-app
-    environment:
-      SELENIUM_REMOTE_URL: http://chrome:4444/wd/hub
     ports:
       - 80:80

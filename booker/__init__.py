@@ -1,7 +1,6 @@
 import locale
-import sys
 
-from booker import parser
+from booker import config, io
 from booker.tasks import NotificationTask, ReservationTask
 from booker.types import User
 
@@ -9,14 +8,13 @@ locale.setlocale(locale.LC_TIME, "ja_JP.UTF-8")
 
 
 def main():
-    args = parser.parse_args(sys.argv[1:])
+    users = io.read_jsonlines_s3(config.USERS_FILE_PATH)
+    for user_kwargs in users:
+        do_task(user_kwargs)
 
-    user = User(
-        name_kanji=args.name_kanji,
-        name_kana=args.name_kana,
-        telephone=args.telephone,
-        email=args.email,
-    )
+
+def do_task(user_kwargs):
+    user = User(**user_kwargs)
 
     reservation_task = ReservationTask(user)
     reservation_task()

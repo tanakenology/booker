@@ -164,12 +164,11 @@ class ReservationTaskTestCase(TestCase):
     "date",
     ["5月5日（木・祝）", "5月6日（金）", "5月7日（土）"],
 )
-@patch("booker.tasks.config")
-def test_match_date_pattern(config_mock, date):
+def test_match_date_pattern(date):
     user = MagicMock(spec=User)
-    config_mock.DATE_PATTERN = "（土,（日,祝）"
+    user.date_pattern = "（土,（日,祝）"
     expected = None
-    for pattern in config_mock.DATE_PATTERN.split(","):
+    for pattern in user.date_pattern.split(","):
         if pattern in date:
             expected = True
             break
@@ -205,6 +204,7 @@ class NotificationTaskTestCase(TestCase):
             name_kana="センコウミツヨウ",
             telephone="012-345-6789",
             email="test@example.com",
+            date_pattern="（土,（日,祝）",
         )
         self.reservations = [
             Reservation(

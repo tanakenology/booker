@@ -11,6 +11,8 @@ setup(
         "selenium==4.1.3",
         "webdriver-manager==3.5.4",
         "python-dotenv==0.20.0",
+        "boto3==1.22.9",
+        "jsonlines==3.0.0",
     ],
     extras_require={
         "dev": [

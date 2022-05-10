@@ -1,32 +1,47 @@
 from unittest import TestCase
-from unittest.mock import patch
+from unittest.mock import MagicMock, call, patch
 
 import booker
 
 
 class BookerMainTestCase(TestCase):
-    @patch("booker.User")
-    @patch("booker.ReservationTask")
-    @patch("booker.NotificationTask")
-    @patch("booker.parser")
+    @patch("booker.do_task")
+    @patch("booker.io.read_jsonlines_s3")
+    @patch("booker.config")
     def test_main(
         self,
-        parser_mock,
-        notification_task_mock,
-        reservation_task_mock,
-        user_type_mock,
+        config_mock,
+        read_jsonlines_s3_mock,
+        do_task_mock,
     ):
-        args = parser_mock.parse_args.return_value
+        user_kwargs_1, user_kwargs_2 = MagicMock(), MagicMock()
+        read_jsonlines_s3_mock.return_value = [user_kwargs_1, user_kwargs_2]
 
         actual = booker.main()
 
         self.assertIsNone(actual)
-        user_type_mock.assert_called_once_with(
-            name_kanji=args.name_kanji,
-            name_kana=args.name_kana,
-            telephone=args.telephone,
-            email=args.email,
+        read_jsonlines_s3_mock.assert_called_once_with(
+            config_mock.USERS_FILE_PATH
         )
+        do_task_mock.assert_has_calls(
+            [call(user_kwargs_1), call(user_kwargs_2)]
+        )
+
+    @patch("booker.User")
+    @patch("booker.ReservationTask")
+    @patch("booker.NotificationTask")
+    def test_do_task(
+        self,
+        notification_task_mock,
+        reservation_task_mock,
+        user_type_mock,
+    ):
+        user_kwargs = MagicMock()
+
+        actual = booker.do_task(user_kwargs)
+
+        self.assertIsNone(actual)
+        user_type_mock.assert_called_once_with(**user_kwargs)
         reservation_task_mock.assert_called_once_with(
             user_type_mock.return_value
         )
