@@ -14,12 +14,6 @@
       ],
       "essential": true,
       "command": ["booker"],
-      "secrets": [
-        {
-          "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:118815212218:secret:booker-r6kNcX",
-          "name": "booker"
-        }
-      ],
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
