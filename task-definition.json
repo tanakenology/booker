@@ -53,5 +53,5 @@
   ],
   "executionRoleArn": "ecsTaskExecutionRole",
   "cpu": "256",
-  "memory": "1024"
+  "memory": "4096"
 }
