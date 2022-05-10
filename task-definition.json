@@ -20,7 +20,8 @@
             "awslogs-region": "ap-northeast-1",
             "awslogs-stream-prefix": "ecs"
         }
-      }
+      },
+      "essential": false
     },
     {
       "name": "booker-chrome",
@@ -39,7 +40,8 @@
             "awslogs-region": "ap-northeast-1",
             "awslogs-stream-prefix": "ecs"
         }
-      }
+      },
+      "essential": false
     }
   ],
   "runtimePlatform": {
