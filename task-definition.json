@@ -33,7 +33,15 @@
           "protocol": "tcp"
         }
       ],
-      "essential": true
+      "essential": true,
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+            "awslogs-group": "/ecs/booker/chrome",
+            "awslogs-region": "ap-northeast-1",
+            "awslogs-stream-prefix": "ecs"
+        }
+      }
     }
   ],
   "runtimePlatform": {
