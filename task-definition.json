@@ -12,7 +12,7 @@
           "protocol": "tcp"
         }
       ],
-      "command": ["sh", "-c", "sleep 30 ; booker"],
+      "command": ["booker"],
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
