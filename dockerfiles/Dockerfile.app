@@ -2,7 +2,8 @@ FROM python:3.10-slim
 
 RUN apt update && \
     apt install -y \
-        locales
+        locales \
+        netcat
 
 RUN sed -i '/ja_JP.UTF-8/s/^# //g' /etc/locale.gen && locale-gen
 ENV LANG ja_JP.UTF-8
