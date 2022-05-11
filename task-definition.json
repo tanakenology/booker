@@ -12,7 +12,7 @@
           "protocol": "tcp"
         }
       ],
-      "command": ["booker"],
+      "command": ["sh", "-c", "sleep 120 ; booker"],
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
@@ -39,8 +39,7 @@
             "awslogs-region": "ap-northeast-1",
             "awslogs-stream-prefix": "ecs"
         }
-      },
-      "essential": false
+      }
     }
   ],
   "runtimePlatform": {
