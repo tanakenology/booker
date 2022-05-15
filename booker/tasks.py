@@ -1,4 +1,9 @@
+import logging
 import os
+import sys
+from subprocess import DEVNULL, STDOUT, Popen
+from time import sleep
+from urllib.parse import urlparse
 
 import requests
 from selenium import webdriver
@@ -6,7 +11,50 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 
 from booker import config, metadata
+from booker.io import read_jsonlines_s3
 from booker.types import Reservation, User
+
+
+class CheckingConnectionTask:
+    def __init__(self):
+        o = urlparse(config.SELENIUM_REMOTE_URL)
+        host, port = o.netloc.split(":")
+        self.host = host
+        self.port = port
+        self.is_connectable = False
+
+    def __call__(self):
+        retry = 10
+        for _ in range(retry):
+            if self._check_connection():
+                self.is_connectable = True
+                break
+            logging.info("Sleeping.")
+            sleep(1)
+        else:
+            logging.error(f"🚨 Failed to connect to {self.host}:{self.port}!")
+            sys.exit(1)
+
+    def _check_connection(self):
+        process = Popen(
+            ["nc", "-zv", self.host, self.port], stdout=DEVNULL, stderr=STDOUT
+        )
+        if process.wait() != 0:
+            logging.warning(
+                f"⛔ Unable to communicate with {self.host}:{self.port}."
+            )
+            return False
+        else:
+            logging.info(f"✅ Can communicate with {self.host}:{self.port}!")
+            return True
+
+
+class LoadingUserTask:
+    def __init__(self):
+        self.users = []
+
+    def __call__(self):
+        self.users = read_jsonlines_s3(config.USERS_FILE_PATH)
 
 
 class ReservationTask:
@@ -127,7 +175,7 @@ class ReservationTask:
 
 
 class NotificationTask:
-    def __init__(self, reservations):
+    def __init__(self, reservations: list[Reservation]):
         self.reservations = reservations
         self.token = config.SLACK_TOKEN
         self.channel = config.SLACK_CHANNEL
@@ -138,14 +186,12 @@ class NotificationTask:
 
     def _notify(self, reservation):
         filename = f"{reservation.reserved_date}.png"
-        comment = f"""
-        予約が完了しました。
-        ```
-        {reservation.application_number}
-        {reservation.inquiry_number}
-        利用日：{reservation.reserved_date}
-        ```
-        """
+        comment = f"""予約が完了しました。
+```
+{reservation.application_number}
+{reservation.inquiry_number}
+利用日：{reservation.reserved_date}
+```"""
         files = {"file": open(filename, "rb")}
         param = {
             "token": self.token,

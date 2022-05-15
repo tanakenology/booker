@@ -4,6 +4,8 @@ from unittest.mock import MagicMock, call, mock_open, patch
 import pytest
 from booker.tasks import (
     By,
+    CheckingConnectionTask,
+    LoadingUserTask,
     NotificationTask,
     Reservation,
     ReservationTask,
@@ -13,14 +15,148 @@ from booker.tasks import (
 )
 
 
+class CheckingConnectionTaskTestCase(TestCase):
+    @patch("booker.tasks.config")
+    @patch("booker.tasks.urlparse")
+    def test__init(self, urlparse_mock, config_mock):
+        host, port = MagicMock(), MagicMock()
+        urlparse_mock.return_value.netloc.split.return_value = [host, port]
+
+        sut = CheckingConnectionTask()
+
+        urlparse_mock.assert_called_once_with(config_mock.SELENIUM_REMOTE_URL)
+        urlparse_mock.return_value.netloc.split.assert_called_once_with(":")
+        self.assertEqual(sut.host, host)
+        self.assertEqual(sut.port, port)
+        self.assertEqual(sut.is_connectable, False)
+
+    @patch("booker.tasks.sleep")
+    @patch("booker.tasks.logging")
+    @patch("booker.tasks.CheckingConnectionTask._check_connection")
+    @patch("booker.tasks.config")
+    def test__call_connectable(
+        self, config_mock, check_connection_mock, logging_mock, sleep_mock
+    ):
+        config_mock.SELENIUM_REMOTE_URL = "http://local.selenium:4444/wd/hub"
+        check_connection_mock.side_effect = [False, False, False, True]
+
+        sut = CheckingConnectionTask()
+        actual = sut()
+
+        self.assertIsNone(actual)
+        self.assertTrue(sut.is_connectable)
+        logging_mock.info.assert_has_calls(
+            [call("Sleeping."), call("Sleeping."), call("Sleeping.")]
+        )
+        sleep_mock.assert_has_calls([call(1), call(1), call(1)])
+
+    @patch("booker.tasks.sys")
+    @patch("booker.tasks.sleep")
+    @patch("booker.tasks.logging")
+    @patch("booker.tasks.CheckingConnectionTask._check_connection")
+    @patch("booker.tasks.config")
+    def test__call_not_connectable(
+        self,
+        config_mock,
+        check_connection_mock,
+        logging_mock,
+        sleep_mock,
+        sys_mock,
+    ):
+        config_mock.SELENIUM_REMOTE_URL = "http://local.selenium:4444/wd/hub"
+        retry = 10
+        check_connection_mock.side_effect = [False] * retry
+
+        sut = CheckingConnectionTask()
+        actual = sut()
+
+        self.assertIsNone(actual)
+        self.assertFalse(sut.is_connectable)
+        logging_mock.info.assert_has_calls([call("Sleeping.")] * retry)
+        sleep_mock.assert_has_calls([call(1)] * retry)
+        logging_mock.error.assert_called_once_with(
+            "🚨 Failed to connect to local.selenium:4444!"
+        )
+        sys_mock.exit.assert_called_once_with(1)
+
+    @patch("booker.tasks.logging")
+    @patch("booker.tasks.STDOUT")
+    @patch("booker.tasks.DEVNULL")
+    @patch("booker.tasks.Popen")
+    @patch("booker.tasks.config")
+    def test__check_connection_connectable(
+        self, config_mock, Popen_mock, DEVNULL_mock, STDOUT_mock, logging_mock
+    ):
+        config_mock.SELENIUM_REMOTE_URL = "http://local.selenium:4444/wd/hub"
+        Popen_mock.return_value.wait.return_value = 0
+
+        sut = CheckingConnectionTask()
+        actual = sut._check_connection()
+
+        self.assertTrue(actual)
+        Popen_mock.assert_called_once_with(
+            ["nc", "-zv", sut.host, sut.port],
+            stdout=DEVNULL_mock,
+            stderr=STDOUT_mock,
+        )
+        Popen_mock.return_value.wait.assert_called_once_with()
+        logging_mock.info.assert_called_once_with(
+            f"✅ Can communicate with {sut.host}:{sut.port}!"
+        )
+
+    @patch("booker.tasks.logging")
+    @patch("booker.tasks.STDOUT")
+    @patch("booker.tasks.DEVNULL")
+    @patch("booker.tasks.Popen")
+    @patch("booker.tasks.config")
+    def test__check_connection_not_connectable(
+        self, config_mock, Popen_mock, DEVNULL_mock, STDOUT_mock, logging_mock
+    ):
+        config_mock.SELENIUM_REMOTE_URL = "http://local.selenium:4444/wd/hub"
+        Popen_mock.return_value.wait.return_value = 1
+
+        sut = CheckingConnectionTask()
+        actual = sut._check_connection()
+
+        self.assertFalse(actual)
+        Popen_mock.assert_called_once_with(
+            ["nc", "-zv", sut.host, sut.port],
+            stdout=DEVNULL_mock,
+            stderr=STDOUT_mock,
+        )
+        Popen_mock.return_value.wait.assert_called_once_with()
+        logging_mock.warning.assert_called_once_with(
+            f"⛔ Unable to communicate with {sut.host}:{sut.port}."
+        )
+
+
+class LoadingUserTaskTestCase(TestCase):
+    def test__init(self):
+        sut = LoadingUserTask()
+
+        self.assertEqual(sut.users, [])
+
+    @patch("booker.tasks.config")
+    @patch("booker.tasks.read_jsonlines_s3")
+    def test__call(self, read_jsonlines_s3_mock, config_mock):
+        sut = LoadingUserTask()
+        actual = sut()
+
+        self.assertIsNone(actual)
+        self.assertEqual(sut.users, read_jsonlines_s3_mock.return_value)
+        read_jsonlines_s3_mock.assert_called_once_with(
+            config_mock.USERS_FILE_PATH
+        )
+
+
 class ReservationTaskTestCase(TestCase):
     def test__init(self):
         user = MagicMock(spec=User)
 
-        actual = ReservationTask(user)
+        sut = ReservationTask(user)
 
-        self.assertEqual(actual.user, user)
-        self.assertEqual(actual.reservations, [])
+        self.assertEqual(sut.user, user)
+        self.assertEqual(sut.reservations, [])
 
     @patch("booker.tasks.ReservationTask._start")
     @patch("booker.tasks.webdriver")
@@ -246,14 +382,12 @@ class NotificationTaskTestCase(TestCase):
     def test_notify(self, requests_mock, os_mock):
         reservation = self.reservations[0]
         filename = f"{reservation.reserved_date}.png"
-        comment = f"""
-        予約が完了しました。
-        ```
-        {reservation.application_number}
-        {reservation.inquiry_number}
-        利用日：{reservation.reserved_date}
-        ```
-        """
+        comment = f"""予約が完了しました。
+```
+{reservation.application_number}
+{reservation.inquiry_number}
+利用日：{reservation.reserved_date}
+```"""
         m = mock_open()
         files = {"file": m.return_value}
 
