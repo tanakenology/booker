@@ -6,25 +6,17 @@
 
 ### 1. `.env` ファイルを置く
 ```
+USERS_FILE_PATH=s3://path/to/users.jsonl
 SELENIUM_REMOTE_URL=http://local.selenium:4444/wd/hub
 RESERVATION_URL=https://...
-DATE_PATTERN=（土,（日,祝）
-NAME_KANJI=中田混沌
-NAME_KANA=ナカタカオス
-TELEPHONE=000-000-0000
-EMAIL=test@example.com
 SLACK_TOKEN=xoxb-...
 SLACK_CHANNEL=C0000000000
 ```
 | 環境変数 | 意味 |
 | --- | --- |
+| USERS_FILE_PATH | S3 上のユーザーデータの URI |
 | SELENIUM_REMOTE_URL | 動作状況を見るために必要 |
 | RESERVATION_URL | 某施設の予約ページ URL |
-| DATE_PATTERN | 予約したい曜日・祝日 |
-| NAME_KANJI | 予約者の氏名（漢字表記） |
-| NAME_KANA | 予約者の氏名（カタカナ表記） |
-| TELEPHONE | 予約者の電話番号（ 000-000-0000 形式） |
-| EMAIL | 予約者のメールアドレス |
 | SLACK_TOKEN | slack の Bot トークン |
 | SLACK_CHANNEL | slack のチャンネル |
 
@@ -40,15 +32,16 @@ $ open vnc://localhost:5900
 ```
 
 ### 3. コマンド実行
+AWS_ACCESS_KEY_ID と AWS_SECRET_ACCESS_KEY は S3 からユーザーデータを読み込むために必要。
+
 ```
-$ docker exec -it [app のコンテナ名 ] booker
+$ docker exec -it -e AWS_ACCESS_KEY_ID=[...] -e AWS_SECRET_ACCESS_KEY=[...] [app のコンテナ名] booker
 ```
 
 
 ## テスト
 
 ### ユニットテスト
-
 ```
 $ python -m venv venv
 $ source venv/bin/activate
