@@ -1,3 +1,4 @@
+from datetime import datetime
 from unittest import TestCase
 from unittest.mock import MagicMock, call, mock_open, patch
 
@@ -259,8 +260,8 @@ class ReservationTaskTestCase(TestCase):
         driver = MagicMock()
         date = "5月4日（水・祝）"
         driver.find_element.return_value.text.split.return_value = [
-            "a001",
-            "i001",
+            "到達番号：123_456_789_0123",
+            "問合せ番号：AbCdEf",
         ]
 
         sut = ReservationTask(user)
@@ -270,11 +271,14 @@ class ReservationTaskTestCase(TestCase):
         driver.find_element.assert_called_once_with(
             By.XPATH, metadata.XPATH_APPLICATION_NUMBERS
         )
-        sut.reservations[0] = Reservation(
-            user=user,
-            reserved_date=date,
-            application_number="a001",
-            inquiry_number="i001",
+        self.assertEqual(
+            sut.reservations[0],
+            Reservation(
+                user=user,
+                reserved_date=date,
+                application_number="123_456_789_0123",
+                inquiry_number="AbCdEf",
+            ),
         )
 
     def test_save_screenshot(self):
@@ -346,14 +350,14 @@ class NotificationTaskTestCase(TestCase):
             Reservation(
                 user=self.user,
                 reserved_date="5月3日（火・祝）",
-                application_number="a001",
-                inquiry_number="i001",
+                application_number="123_456_789_0001",
+                inquiry_number="AbCdEf",
             ),
             Reservation(
                 user=self.user,
                 reserved_date="5月4日（水・祝）",
-                application_number="a002",
-                inquiry_number="i002",
+                application_number="123_456_789_0002",
+                inquiry_number="GhIjKl",
             ),
         ]
 
@@ -379,14 +383,29 @@ class NotificationTaskTestCase(TestCase):
 
     @patch("booker.tasks.os")
     @patch("booker.tasks.requests")
-    def test_notify(self, requests_mock, os_mock):
+    @patch("booker.tasks.datetime")
+    def test_notify(self, datetime_mock, requests_mock, os_mock):
         reservation = self.reservations[0]
         filename = f"{reservation.reserved_date}.png"
         comment = f"""予約が完了しました。
 ```
-{reservation.application_number}
-{reservation.inquiry_number}
-利用日：{reservation.reserved_date}
+到達日時：
+  {datetime_mock.now.return_value.strftime.return_value}
+到達番号：
+  {reservation.application_number}
+問い合わせ番号：
+  {reservation.inquiry_number}
+申込内容：
+お名前:
+  {reservation.user.name_kanji}
+お名前(フリガナ):
+  {reservation.user.name_kana}
+電話番号:
+  {reservation.user.telephone}
+メールアドレス:
+  {reservation.user.email}
+来館利用日時 :
+  {reservation.reserved_date} 14:00-17:30
 ```"""
         m = mock_open()
         files = {"file": m.return_value}
@@ -403,6 +422,9 @@ class NotificationTaskTestCase(TestCase):
             actual = sut._notify(reservation)
 
         self.assertIsNone(actual)
+        datetime_mock.now.return_value.strftime.assert_called_once_with(
+            "%Y年%m月%d日 %H時%M分"
+        )
         m.assert_called_once_with(filename, "rb")
         requests_mock.post.assert_called_once_with(
             url="https://slack.com/api/files.upload",

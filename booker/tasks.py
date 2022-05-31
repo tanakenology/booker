@@ -1,6 +1,7 @@
 import logging
 import os
 import sys
+from datetime import datetime
 from subprocess import DEVNULL, STDOUT, Popen
 from time import sleep
 from urllib.parse import urlparse
@@ -162,8 +163,8 @@ class ReservationTask:
             Reservation(
                 user=self.user,
                 reserved_date=date,
-                application_number=application_number,
-                inquiry_number=inquiry_number,
+                application_number=application_number[-16:],
+                inquiry_number=inquiry_number[-6:],
             )
         )
 
@@ -188,9 +189,23 @@ class NotificationTask:
         filename = f"{reservation.reserved_date}.png"
         comment = f"""予約が完了しました。
 ```
-{reservation.application_number}
-{reservation.inquiry_number}
-利用日：{reservation.reserved_date}
+到達日時：
+  {datetime.now().strftime("%Y年%m月%d日 %H時%M分")}
+到達番号：
+  {reservation.application_number}
+問い合わせ番号：
+  {reservation.inquiry_number}
+申込内容：
+お名前:
+  {reservation.user.name_kanji}
+お名前(フリガナ):
+  {reservation.user.name_kana}
+電話番号:
+  {reservation.user.telephone}
+メールアドレス:
+  {reservation.user.email}
+来館利用日時 :
+  {reservation.reserved_date} 14:00-17:30
 ```"""
         files = {"file": open(filename, "rb")}
         param = {
