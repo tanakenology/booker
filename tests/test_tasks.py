@@ -65,7 +65,7 @@ class CheckingConnectionTaskTestCase(TestCase):
         sys_mock,
     ):
         config_mock.SELENIUM_REMOTE_URL = "http://local.selenium:4444/wd/hub"
-        retry = 10
+        retry = 100
         check_connection_mock.side_effect = [False] * retry
 
         sut = CheckingConnectionTask()

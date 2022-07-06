@@ -25,7 +25,7 @@ class CheckingConnectionTask:
         self.is_connectable = False
 
     def __call__(self):
-        retry = 10
+        retry = 100
         for _ in range(retry):
             if self._check_connection():
                 self.is_connectable = True
