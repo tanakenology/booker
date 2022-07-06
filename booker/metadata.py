@@ -10,7 +10,7 @@ XPATH_EMAIL_CONFIRMATION_FORM = (
     "/html/body/div[3]/form/table/tbody/tr[4]/td[2]/div/div[2]/input"
 )
 XPATH_CHECK_TIME_FORM = (
-    "/html/body/div[3]/form/table/tbody/tr[5]/td[2]/fieldset/input[2]"
+    "/html/body/div[3]/form/table/tbody/tr[5]/td[2]/fieldset/input"
 )
 XPATH_CONFIRMATION_BUTTON = "/html/body/div[3]/form/div[4]/div[2]/input"
 XPATH_APPLY_BUTTON = "/html/body/div[3]/div[5]/div[2]/form/input[8]"
