@@ -255,6 +255,38 @@ class ReservationTaskTestCase(TestCase):
         store_reservation_mock.assert_called_once_with(driver, date)
         save_screenshot_mock.assert_called_once_with(driver, date)
 
+    @patch("booker.tasks.ReservationTask._is_reservable")
+    def test_reserve_same_user_error(self, is_reservable_mock):
+        from fixtures.tasks_reserve_fixtures import xpath_values
+
+        user = MagicMock(spec=User)
+        user.name_kanji = "潜行密用"
+        user.name_kana = "センコウミツヨウ"
+        user.telephone = "012-345-6789"
+        user.email = "test@example.com"
+        driver = MagicMock()
+        date = "5月4日（水・祝）"
+        is_reservable_mock.return_value = False
+
+        sut = ReservationTask(user)
+        actual = sut._reserve(driver, date)
+
+        self.assertIsNone(actual)
+        for xpath, value in xpath_values:
+            driver.find_element.assert_has_calls([call(By.XPATH, xpath)])
+            driver.find_element.return_value.send_keys.assert_has_calls(
+                [call(value)]
+            )
+        driver.find_element.assert_has_calls(
+            [call(By.XPATH, metadata.XPATH_CONFIRMATION_BUTTON)]
+        )
+        driver.find_element.return_value.click.assert_has_calls([call()])
+        driver.find_element.assert_has_calls(
+            [call(By.XPATH, metadata.XPATH_APPLY_BUTTON)]
+        )
+        driver.find_element.return_value.click.assert_has_calls([call()])
+        is_reservable_mock.assert_called_once_with(driver)
+
     def test_store_reservation(self):
         user = MagicMock(spec=User)
         driver = MagicMock()

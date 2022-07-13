@@ -151,9 +151,9 @@ class ReservationTask:
         # click apply button
         driver.find_element(By.XPATH, metadata.XPATH_APPLY_BUTTON).click()
 
-        self._store_reservation(driver, date)
-
-        self._save_screenshot(driver, date)
+        if self._is_reservable(driver):
+            self._store_reservation(driver, date)
+            self._save_screenshot(driver, date)
 
     def _store_reservation(self, driver, date):
         application_number, inquiry_number = driver.find_element(
